@@ -15,7 +15,8 @@ YDL_OPTS = {
     "ignoreerrors": True,
     "no_warnings": True,
     "noplaylist": True,
-    "cookiefile": "./cookies.txt"
+    "cookiefile": "./cookies.txt",
+    'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
 }
 
 
