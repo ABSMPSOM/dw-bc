@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from services.youtube_service import (
+    get_download_url,
     get_youtube_qualities,
     download_youtube_video
 )
@@ -72,25 +73,12 @@ def youtube_download():
     url = data.get("url")
     format_id = data.get("format_id")
 
-    if not url or not format_id:
-        return jsonify({
-            "success": False,
-            "message": "Missing data"
-        }), 400
+    result = get_download_url(
+        url,
+        format_id
+    )
 
-    try:
-        result = download_youtube_video(url, format_id)
-
-        return jsonify({
-            "success": True,
-            "data": result
-        })
-
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": str(e)
-        }), 500
+    return jsonify(result)
 
 
 # =========================

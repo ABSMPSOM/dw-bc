@@ -5,19 +5,29 @@ DOWNLOAD_DIR = Path("downloads")
 DOWNLOAD_DIR.mkdir(exist_ok=True)
 
 
-def get_youtube_qualities(video_url):
+# =========================
+# COMMON YDL OPTIONS
+# =========================
 
-    ydl_opts = {
-        "quiet": True,
-        "nocheckcertificate": True,
-        "ignoreerrors": True,
-        "no_warnings": True,
-        "noplaylist": True
-    }
+YDL_OPTS = {
+    "quiet": True,
+    "nocheckcertificate": True,
+    "ignoreerrors": True,
+    "no_warnings": True,
+    "noplaylist": True,
+    "cookiefile": "cookies.txt"
+}
+
+
+# =========================
+# GET AVAILABLE QUALITIES
+# =========================
+
+def get_youtube_qualities(video_url):
 
     try:
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(YDL_OPTS) as ydl:
 
             info = ydl.extract_info(
                 video_url,
@@ -31,7 +41,7 @@ def get_youtube_qualities(video_url):
 
     except Exception as e:
 
-        print("YOUTUBE QUALITY ERROR:")
+        print("QUALITY ERROR:")
         print(str(e))
 
         return []
@@ -85,23 +95,101 @@ def get_youtube_qualities(video_url):
     return result
 
 
+# =========================
+# GET DIRECT DOWNLOAD URL
+# =========================
+
+def get_download_url(
+    video_url,
+    format_id
+):
+
+    try:
+
+        with yt_dlp.YoutubeDL(YDL_OPTS) as ydl:
+
+            info = ydl.extract_info(
+                video_url,
+                download=False
+            )
+
+            if not info:
+
+                return {
+                    "success": False
+                }
+
+            formats = info.get("formats", [])
+
+            selected_video = None
+
+            for fmt in formats:
+
+                if (
+                    fmt["format_id"] == format_id
+                    and fmt.get("vcodec") != "none"
+                ):
+
+                    selected_video = fmt
+                    break
+
+            best_audio = None
+
+            for fmt in formats:
+
+                if (
+                    fmt.get("acodec") != "none"
+                    and fmt.get("vcodec") == "none"
+                ):
+
+                    best_audio = fmt
+
+            if not selected_video:
+
+                return {
+                    "success": False,
+                    "error": "Video format missing"
+                }
+
+            return {
+
+                "success": True,
+
+                "title": info.get("title"),
+
+                "video_url":
+                    selected_video.get("url"),
+
+                "audio_url":
+                    best_audio.get("url")
+                    if best_audio else None
+            }
+
+    except Exception as e:
+
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+# =========================
+# OPTIONAL SERVER DOWNLOAD
+# =========================
+
 def download_youtube_video(
     video_url,
     format_id
 ):
 
     ydl_opts = {
+        **YDL_OPTS,
+
         "format": f"{format_id}+bestaudio",
         "merge_output_format": "mp4",
+
         "outtmpl": str(
             DOWNLOAD_DIR / "%(title)s.%(ext)s"
-        ),
-        "noplaylist": True,
-        "quiet": True,
-        "nocheckcertificate": True,
-        "ignoreerrors": True,
-        "no_warnings": True,
-        "cookiefile": "cookies.txt"
+        )
     }
 
     try:
