@@ -16,8 +16,7 @@ YDL_OPTS = {
     "no_warnings": True,
     "noplaylist": True,
     "cookiefile": "./cookies.txt",
-    'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-    "extractor_args": {"youtube": ["player_client=android"]}
+    'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
 }
 
 
