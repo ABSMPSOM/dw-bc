@@ -15,7 +15,7 @@ YDL_OPTS = {
     "ignoreerrors": True,
     "no_warnings": True,
     "noplaylist": True,
-    "cookiefile": "cookies.txt"
+    "cookiefile": "./cookies.txt"
 }
 
 
